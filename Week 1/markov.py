@@ -14,11 +14,10 @@ def generate_transitions(tokenized_source, save_source):
     begin = time.time()
     print 'generating transitions'
     wdict = {}
-
     for token in tokenized_source:
         if token not in wdict:
             # Find all occurrences of token, get their successors.
-            wdict[token] = nth_order_occ_dict(token, tokenized_source, 1)
+            wdict[token] = nth_order_occ_dict(token, tokenized_source)
 
     end = time.time()
     print 'it took ' + str(end - begin) + ' seconds to construct the transitions'
@@ -28,10 +27,29 @@ def generate_transitions(tokenized_source, save_source):
 
     return wdict
 
+def generate_transitions_fast(tokenized_source, save_source):
+    begin = time.time()
+    print 'generating transitions fast'
+    ret = {}
+    prev = ''
+    for token in tokenized_source:
+        if token not in ret:
+            ret[token] = {}
+
+        if prev != '':
+            if token not in ret[prev]:
+                ret[prev][token] = 1
+            else:
+                ret[prev][token] += 1
+
+        prev = token
+    end = time.time()
+    print 'it took ' + str(end - begin) + ' seconds to construct the transitions'
+    return ret
+
 ## This is not yet working, need to parse all the dicts together
 def nth_order_occ_dict(t, tokenized_source, order=1):
     current = occurrence_dict(t, tokenized_source)
-
     for i in range(1, order):
         new_wdict = {}
         for token in current:
@@ -45,7 +63,6 @@ def nth_order_occ_dict(t, tokenized_source, order=1):
         current = new_wdict
 
     return current
-
 
 def occurrence_dict(t, tokenized_source):
     ret = {}
@@ -100,4 +117,4 @@ def get_next_token(transition_dict):
     return ret
 
 def generate_markov_from_source(tokenized_source, length, save_source=False):
-    return generate_markov(generate_transitions(tokenized_source, save_source), length)
+    return generate_markov(generate_transitions_fast(tokenized_source, save_source), length)

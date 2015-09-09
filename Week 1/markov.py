@@ -15,9 +15,28 @@ def generate_transitions(tokenized_source):
     for token in tokenized_source:
         if token not in wdict:
             # Find all occurrences of token, get their successors.
-            wdict[token] = occurrence_dict(token, tokenized_source)
+            wdict[token] = nth_order_occ_dict(token, tokenized_source, 2)
 
     return wdict
+
+## This is not yet working, need to parse all the dicts together
+def nth_order_occ_dict(t, tokenized_source, order=1):
+    current = occurrence_dict(t, tokenized_source)
+
+    for i in range(1, order):
+        new_wdict = {}
+        for token in current:
+            temp = occurrence_dict(token, tokenized_source)
+            for temp_t in temp:
+                if temp_t not in new_wdict:
+                    new_wdict[temp_t] = 1
+                else:
+                    new_wdict[temp_t] += 1
+
+        current = new_wdict
+
+    return current
+
 
 def occurrence_dict(t, tokenized_source):
     ret = {}

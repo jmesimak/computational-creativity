@@ -4,18 +4,27 @@
 from random import randint
 from copy import copy
 from collections import OrderedDict
+import time
+import json
 
 # For each word/symbol, we need to find out all the possible words/symbols that can appear after it.
 # We also need the counts in order to work with the probabilities.
 # 'computer': {'science': 5, 'system': 4, 'repair': 3}
-def generate_transitions(tokenized_source):
+def generate_transitions(tokenized_source, save_source):
+    begin = time.time()
     print 'generating transitions'
     wdict = {}
 
     for token in tokenized_source:
         if token not in wdict:
             # Find all occurrences of token, get their successors.
-            wdict[token] = nth_order_occ_dict(token, tokenized_source, 2)
+            wdict[token] = nth_order_occ_dict(token, tokenized_source, 1)
+
+    end = time.time()
+    print 'it took ' + str(end - begin) + ' seconds to construct the transitions'
+
+    if save_source:
+        json.dump(wdict, open('wdictdump', 'w'))
 
     return wdict
 
@@ -54,16 +63,21 @@ def occurrence_dict(t, tokenized_source):
             else:
                 ret[next_t] += 1
 
+
     return ret
 
 def generate_markov(wdict, length):
     print 'generating markov'
     keys = wdict.keys()
     cur_t = keys[randint(0, len(keys) - 1)]
+    while not str.istitle(str(cur_t[0])):
+        cur_t = keys[randint(0, len(keys) - 1)]
     ret = cur_t
+
     for x in range(0, length):
         cur_t = get_next_token(wdict[cur_t])
-        ret += ' '
+        if cur_t != ',':
+            ret += ' '
         ret += cur_t
     return ret
 
@@ -85,5 +99,5 @@ def get_next_token(transition_dict):
 
     return ret
 
-def generate_markov_from_source(tokenized_source, length):
-    return generate_markov(generate_transitions(tokenized_source), length)
+def generate_markov_from_source(tokenized_source, length, save_source=False):
+    return generate_markov(generate_transitions(tokenized_source, save_source), length)

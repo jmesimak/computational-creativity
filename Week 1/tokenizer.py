@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import nltk
+import string
 
 def split_text(text):
-    return nltk.word_tokenize(text)
+    return text.replace('\n', '').translate(string.maketrans("",""), string.punctuation).split(' ')

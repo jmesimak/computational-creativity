@@ -11,14 +11,12 @@ fs.readFile('bachnotes', 'utf-8', function(err, notes) {
   var startD = Object.keys(dO)[getRandomInt(0, Object.keys(dO).length)];
   var construct = '';
   for (var i = 0; i < length; i++) {
-    // console.log(startP);
     construct += startP + startD + ' ';
     startP = pO[startP][getRandomInt(0, pO[startP].length)];
     startD = dO[startD][getRandomInt(0, dO[startD].length)];
   }
   smoothOccurrences(occurrences.pitchOccurrences);
   smoothOccurrences(occurrences.durationOccurrences);
-  // console.log(occurrences.pitchOccurrences);
   fs.writeFile('musicchain_2_smooth', construct);
 
 });
@@ -35,9 +33,6 @@ function smoothOccurrences(occurrences) {
     var ctr = 0;
     var note = keys[i];
 
-    console.log('NOTE');
-    console.log(note);
-
     arr.forEach((item) => {
       if (!map.get(item)) {
         map.set(item, 1);
@@ -50,9 +45,6 @@ function smoothOccurrences(occurrences) {
     var inc = Math.floor((ctr / map.size) * 1.2);
 
     map.forEach((val, k) => {
-      console.log('key');
-      console.log(k);
-      console.log(val);
       if (val < inc) {
         map.set(k, val + inc);
       } else {
@@ -63,9 +55,6 @@ function smoothOccurrences(occurrences) {
     var newArr = [];
 
     map.forEach((val, k) => {
-      console.log('key');
-      console.log(k);
-      console.log(val);
       for (var i = 0; i < val; i++) {
         newArr.push(k);
       }
